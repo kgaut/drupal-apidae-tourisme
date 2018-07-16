@@ -1,0 +1,11 @@
+
+apidae_tourisme.apidae_config_form:
+  path: '/admin/config/services/apidae'
+  defaults:
+    _form: '\Drupal\apidae_tourisme\Form\ApidaeConfigForm'
+    _title: 'Configuration Apidae'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
+

@@ -1,0 +1,7 @@
+apidae_tourisme.apidae_config_form:
+  title: 'Configuration Apidae'
+  route_name: apidae_tourisme.apidae_config_form
+  description: 'Apidae Module Configuration'
+  parent: system.admin_config_services
+  weight: 99
+
