@@ -1,0 +1,4 @@
+configure apidae:
+  title: 'Configure Apidae settings'
+  description: 'Configure authentification to Apidae webservices'
+  restrict access: true
