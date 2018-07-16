@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains apidae_tourisme.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function apidae_tourisme_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the apidae_tourisme module.
+    case 'help.page.apidae_tourisme':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('My Awesome Module') . '</p>';
+      return $output;
+
+    default:
+  }
+}

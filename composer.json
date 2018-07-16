@@ -1,0 +1,14 @@
+{
+  "name": "drupal/apidae_tourisme",
+  "type": "drupal-module",
+  "description": "My Awesome Module",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/apidae_tourisme",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/apidae_tourisme",
+    "source": "http://cgit.drupalcode.org/apidae_tourisme"
+  },
+  "require": { }
+}
