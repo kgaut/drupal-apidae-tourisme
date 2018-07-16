@@ -101,10 +101,16 @@ class ApidaeConfigForm extends ConfigFormBase {
     $this->config('apidae_tourisme.config')
       ->set('auth', $form_state->getValue('auth'))
       ->set('api_key', $form_state->getValue('api_key'))
+      ->set('enabled', $form_state->getValue('enabled'))
       ->set('project_id', $form_state->getValue('project_id'))
       ->set('data', $form_state->getValue('data'))
       ->set('objects', $form_state->getValue('objects'))
       ->save();
+
+    if(!$form_state->getValue('enabled')) {
+      $this->messenger()->addMessage('Please note that sync is not enabled, therefore no content will be synced', 'warning');
+    }
+
   }
 
 }
