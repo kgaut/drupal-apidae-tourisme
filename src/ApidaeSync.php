@@ -30,6 +30,10 @@ class ApidaeSync {
    */
   protected $cacheBackend;
 
+  protected $apidaeProjectId;
+
+  protected $apidaeApiKey;
+
   /**
    * Constructs a new ApidaeSync object.
    */
@@ -37,6 +41,10 @@ class ApidaeSync {
     $this->httpClient = $http_client;
     $this->configFactory = $config_factory;
     $this->cacheBackend = $cacheBackend;
+    $config = $this->configFactory->get('apidae_tourisme.config')->get();
+
+    $this->apidaeApiKey = $config['api_key'];
+    $this->apidaeProjectId = $config['project_id'];
   }
 
 }

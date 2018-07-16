@@ -15,7 +15,7 @@ class ApidaeConfigForm extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'apidae_tourisme.apidaeconfig',
+      'apidae_tourisme.config',
     ];
   }
 
@@ -30,7 +30,7 @@ class ApidaeConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('apidae_tourisme.apidaeconfig');
+    $config = $this->config('apidae_tourisme.config');
     $form['auth'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Auth'),
@@ -41,6 +41,7 @@ class ApidaeConfigForm extends ConfigFormBase {
       '#maxlength' => 128,
       '#size' => 64,
       '#default_value' => $config->get('api_key'),
+      '#required' => TRUE,
     ];
     $form['auth']['project_id'] = [
       '#type' => 'textfield',
@@ -48,10 +49,16 @@ class ApidaeConfigForm extends ConfigFormBase {
       '#maxlength' => 128,
       '#size' => 64,
       '#default_value' => $config->get('project_id'),
+      '#required' => TRUE,
     ];
     $form['data'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Data'),
+    ];
+    $form['data']['enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable sync'),
+      '#default_value' => $config->get('enabled'),
     ];
     $form['data']['objects'] = [
       '#type' => 'checkboxes',
@@ -91,7 +98,7 @@ class ApidaeConfigForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    $this->config('apidae_tourisme.apidaeconfig')
+    $this->config('apidae_tourisme.config')
       ->set('auth', $form_state->getValue('auth'))
       ->set('api_key', $form_state->getValue('api_key'))
       ->set('project_id', $form_state->getValue('project_id'))
