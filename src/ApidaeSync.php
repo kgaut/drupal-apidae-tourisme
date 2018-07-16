@@ -4,6 +4,8 @@ namespace Drupal\apidae_tourisme;
 use Drupal\Core\Cache\CacheBackendInterface;
 use GuzzleHttp\ClientInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Sitra\ApiClient\Client;
+use Sitra\ApiClient\Exception\SitraException;
 
 /**
  * Class ApidaeSync.
@@ -34,6 +36,9 @@ class ApidaeSync {
 
   protected $apidaeApiKey;
 
+  /** @var Client */
+  protected $client;
+
   /**
    * Constructs a new ApidaeSync object.
    */
@@ -45,6 +50,26 @@ class ApidaeSync {
 
     $this->apidaeApiKey = $config['api_key'];
     $this->apidaeProjectId = $config['project_id'];
+
+    $this->createClient();
+  }
+
+  private function createClient() {
+    {
+      try {
+        $this->client = new Client([
+          'apiKey' => $this->apidaeApiKey,
+          'projectId' => $this->apidaeProjectId,
+          'count' => 100,
+        ]);
+      } catch (\Exception $e) {
+        \Drupal::logger('apidae')->error(t('there was an error with the connection, : @message', ['@message' => $e->getMessage()]));
+      }
+    }
+  }
+
+  public function test() {
+
   }
 
 }
