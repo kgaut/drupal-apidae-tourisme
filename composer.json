@@ -10,9 +10,11 @@
     "issues": "https://github.com/kgaut/drupal-apidae-tourisme/issues",
     "source": "https://github.com/kgaut/drupal-apidae-tourisme"
   },
-  "apidae-tourisme": {
-    "type": "vcs",
-    "url": "https://github.com/Moustic-Multimedia/sitra-api-php"
+  "repositories": {
+    "apidae-tourisme": {
+      "type": "vcs",
+      "url": "https://github.com/Moustic-Multimedia/sitra-api-php"
+    }
   },
   "require": {
     "sitra-tourisme/sitra-api-php": "dev-master"
