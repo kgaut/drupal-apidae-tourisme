@@ -11,6 +11,6 @@
     "source": "https://github.com/kgaut/drupal-apidae-tourisme"
   },
   "require": {
-    "apidae-tourisme/sitra-api-php": "^1.0"
+    "sitra-tourisme/sitra-api-php": "^1.0"
   }
 }
