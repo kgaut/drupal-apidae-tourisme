@@ -1,0 +1,10 @@
+services:
+  apidae_toursime.sync:
+    class: Drupal\apidae_tourisme\ApidaeSync
+    arguments: ['@http_client', '@config.factory', '@cache.apidae']
+  cache.apidae:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [apidae]
