@@ -11,7 +11,7 @@
     "source": "https://github.com/kgaut/drupal-apidae-tourisme"
   },
   "repositories": {
-    "apidae-tourisme": {
+    "apidae-sitra": {
       "type": "vcs",
       "url": "https://github.com/Moustic-Multimedia/sitra-api-php"
     }
