@@ -98,13 +98,20 @@ class ApidaeConfigForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
+    $objects = $form_state->getValue('objects');
+    foreach ($objects as $key => $value) {
+      if($key !== $value) {
+        unset($objects[$key]);
+      }
+    }
+
     $this->config('apidae_tourisme.config')
       ->set('auth', $form_state->getValue('auth'))
       ->set('api_key', $form_state->getValue('api_key'))
       ->set('enabled', $form_state->getValue('enabled'))
       ->set('project_id', $form_state->getValue('project_id'))
       ->set('data', $form_state->getValue('data'))
-      ->set('objects', $form_state->getValue('objects'))
+      ->set('objects', $objects)
       ->save();
 
     if(!$form_state->getValue('enabled')) {

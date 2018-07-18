@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\apidae_tourisme;
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheBackendInterface;
 use GuzzleHttp\ClientInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -36,8 +37,11 @@ class ApidaeSync {
 
   protected $apidaeApiKey;
 
+  protected $objects;
+
   /** @var Client */
   protected $client;
+  private static $url = "http://api.apidae-tourisme.com/api/v002/recherche/list-objets-touristiques";
 
   /**
    * Constructs a new ApidaeSync object.
@@ -50,26 +54,45 @@ class ApidaeSync {
 
     $this->apidaeApiKey = $config['api_key'];
     $this->apidaeProjectId = $config['project_id'];
-
-    $this->createClient();
+    $this->objects = $config['objects'];
   }
 
-  private function createClient() {
-    {
+  public function sync() {
+    foreach ($this->objects as $key => $objet) {
+      dd($objet);
       try {
-        $this->client = new Client([
-          'apiKey' => $this->apidaeApiKey,
-          'projectId' => $this->apidaeProjectId,
-          'count' => 100,
-        ]);
-      } catch (\Exception $e) {
-        \Drupal::logger('apidae')->error(t('there was an error with the connection, : @message', ['@message' => $e->getMessage()]));
+        $query = [
+          'criteresQuery' => 'type:' . $key,
+          'projetId'=> $this->apidaeProjectId,
+          'apiKey'=> $this->apidaeApiKey,
+          'responseFields' => [
+            'id',
+            'nom',
+            'illustrations',
+            'multimedias',
+            'informations',
+            'presentation',
+            'localisation',
+            '@informationsObjetTouristique',
+            'ouverture.periodeEnClair',
+            'ouverture.periodesOuvertures',
+            'descriptionTarif.tarifsEnClair.LibelleFr',
+            'contacts',
+          ],
+        ];
+
+        $url = self::$url . '?query=' . Json::encode($query);
+        $response = $this->httpClient->get($url);
+        $data = $response->getBody();
+        $data = Json::decode($data);
+      }
+      catch (\Exception $e) {
+        \Drupal::logger('apidae')->error(t('error @message<br />query : @query', [
+          '@message' => $e->getMessage(),
+          '@query' => print_r($query, TRUE),
+        ]));
       }
     }
-  }
-
-  public function test() {
-
   }
 
 }
