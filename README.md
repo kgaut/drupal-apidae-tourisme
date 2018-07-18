@@ -2,8 +2,6 @@
 
 ## Installation
 
-### Prerequisites 
-
 ```
 composer config repositories.apidae-api vcs https://github.com/Moustic-Multimedia/sitra-api-php
 composer config repositories.apidae-drupal-bridge vcs https://github.com/kgaut/drupal-apidae-tourisme
