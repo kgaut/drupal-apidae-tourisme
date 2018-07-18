@@ -3,7 +3,6 @@
 ## Installation
 
 ### Prerequisites 
-add to the repositorie section ofrt
 
 ```
 composer config repositories.apidae-api vcs https://github.com/Moustic-Multimedia/sitra-api-php
