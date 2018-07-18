@@ -11,6 +11,6 @@
     "source": "https://github.com/kgaut/drupal-apidae-tourisme"
   },
   "require": {
-    "guzzlehttp/guzzle": "*.*"
+    "drupal/geolocation":"^2.*"
   }
 }

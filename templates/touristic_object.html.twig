@@ -1,0 +1,22 @@
+{#
+/**
+ * @file touristic_object.html.twig
+ * Default theme implementation to present Touristic object data.
+ *
+ * This template is used when viewing Touristic object pages.
+ *
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ * - attributes: HTML attributes for the container element.
+ *
+ * @see template_preprocess_touristic_object()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes.addClass('touristic_object') }}>
+  {% if content %}
+    {{- content -}}
+  {% endif %}
+</div>

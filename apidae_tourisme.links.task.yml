@@ -1,0 +1,22 @@
+# Touristic object routing definition
+touristic_object.settings_tab:
+  route_name: touristic_object.settings
+  title: 'Settings'
+  base_route: touristic_object.settings
+
+entity.touristic_object.canonical:
+  route_name: entity.touristic_object.canonical
+  base_route: entity.touristic_object.canonical
+  title: 'View'
+
+entity.touristic_object.edit_form:
+  route_name: entity.touristic_object.edit_form
+  base_route: entity.touristic_object.canonical
+  title: 'Edit'
+
+entity.touristic_object.delete_form:
+  route_name:  entity.touristic_object.delete_form
+  base_route:  entity.touristic_object.canonical
+  title: Delete
+  weight: 10
+
