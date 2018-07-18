@@ -43,6 +43,14 @@ class ApidaeConfigForm extends ConfigFormBase {
       '#default_value' => $config->get('api_key'),
       '#required' => TRUE,
     ];
+    $form['auth']['selectionIds'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('ID des sélections, séparés par une virgule'),
+      '#maxlength' => 128,
+      '#size' => 64,
+      '#default_value' => $config->get('selectionIds'),
+      '#required' => TRUE,
+    ];
     $form['auth']['project_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Project ID'),
@@ -109,6 +117,7 @@ class ApidaeConfigForm extends ConfigFormBase {
       ->set('auth', $form_state->getValue('auth'))
       ->set('api_key', $form_state->getValue('api_key'))
       ->set('enabled', $form_state->getValue('enabled'))
+      ->set('selectionIds', $form_state->getValue('selectionIds'))
       ->set('project_id', $form_state->getValue('project_id'))
       ->set('data', $form_state->getValue('data'))
       ->set('objects', $objects)

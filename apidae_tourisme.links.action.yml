@@ -1,5 +1,0 @@
-entity.touristic_object.add_form:
-  route_name: entity.touristic_object.add_form
-  title: 'Add Touristic object'
-  appears_on:
-    - entity.touristic_object.collection

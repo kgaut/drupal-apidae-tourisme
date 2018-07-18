@@ -6,8 +6,6 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheBackendInterface;
 use GuzzleHttp\ClientInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Sitra\ApiClient\Client;
-use Sitra\ApiClient\Exception\SitraException;
 
 /**
  * Class ApidaeSync.
@@ -40,8 +38,7 @@ class ApidaeSync {
 
   protected $objects;
 
-  /** @var Client */
-  protected $client;
+  protected $territoireIds;
 
   protected $lastUpdate = 0;
 
@@ -59,6 +56,7 @@ class ApidaeSync {
     $this->apidaeApiKey = $config['api_key'];
     $this->apidaeProjectId = $config['project_id'];
     $this->objects = $config['objects'];
+    $this->territoireIds = $config['territoireIds'];
 
     $this->lastUpdate = \Drupal::state()->get('apidae.last_sync', 0);
   }
@@ -85,7 +83,7 @@ class ApidaeSync {
       'criteresQuery' => 'type:' . $type,
       'projetId'=> $this->apidaeProjectId,
       'apiKey'=> $this->apidaeApiKey,
-      'territoireIds'=> [82490,178196],
+      'selectionIds'=> $this->selectionIds,
       'first' => $first,
       'count' => $count,
       'responseFields' => [
@@ -123,6 +121,7 @@ class ApidaeSync {
   protected function parseOject($object) {
     if($objet = TouristicObject::load($object['id'])) {
 
+      dd('update ' . $objet->label());
     }
     else {
       $objet = TouristicObject::create([
@@ -130,6 +129,7 @@ class ApidaeSync {
         'name' => $object['nom']['libelleFr'],
       ]);
     }
+    dd('creation ' . $object['nom']['libelleFr']);
     $objet->save();
   }
 }

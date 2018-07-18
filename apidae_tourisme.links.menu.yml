@@ -5,15 +5,6 @@ apidae_tourisme.apidae_config_form:
   parent: system.admin_config_services
   weight: 99
 
-
-# Touristic object menu items definition
-entity.touristic_object.collection:
-  title: 'Touristic object list'
-  route_name: entity.touristic_object.collection
-  description: 'List Touristic object entities'
-  parent: system.admin_structure
-  weight: 100
-
 touristic_object.admin.structure.settings:
   title: 'Touristic object settings'
   description: 'Configure Touristic object entities'
