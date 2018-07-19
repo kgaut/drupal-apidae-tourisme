@@ -56,17 +56,25 @@ use Drupal\user\UserInterface;
  */
 class TouristicObject extends ContentEntityBase implements TouristicObjectInterface {
 
-  use EntityChangedTrait;
+  public static $type = [
+    'ACTIVITE' => 'ACTIVITE',
+    'COMMERCE_ET_SERVICE' => 'COMMERCE_ET_SERVICE',
+    'DEGUSTATION' => 'DEGUSTATION',
+    'DOMAINE_SKIABLE' => 'DOMAINE_SKIABLE',
+    'EQUIPEMENT' => 'EQUIPEMENT',
+    'FETE_ET_MANIFESTATION' => 'FETE_ET_MANIFESTATION',
+    'HEBERGEMENT_COLLECTIF' => 'HEBERGEMENT_COLLECTIF',
+    'HEBERGEMENT_LOCATIF' => 'HEBERGEMENT_LOCATIF',
+    'HOTELLERIE' => 'HOTELLERIE',
+    'HOTELLERIE_PLEIN_AIR' => 'HOTELLERIE_PLEIN_AIR',
+    'PATRIMOINE_CULTUREL' => 'PATRIMOINE_CULTUREL',
+    'PATRIMOINE_NATUREL' => 'PATRIMOINE_NATUREL',
+    'RESTAURATION' => 'RESTAURATION',
+    'SEJOUR_PACKAGE' => 'SEJOUR_PACKAGE',
+    'TERRITOIRE' => 'TERRITOIRE',
+  ];
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
-    parent::preCreate($storage_controller, $values);
-    $values += [
-      'status' => 1,
-    ];
-  }
+  use EntityChangedTrait;
 
   /**
    * {@inheritdoc}
@@ -121,6 +129,7 @@ class TouristicObject extends ContentEntityBase implements TouristicObjectInterf
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
+      ->setTranslatable(TRUE)
       ->setDescription(t('The name of the Touristic object entity.'))
       ->setSettings([
         'max_length' => 255,
@@ -131,14 +140,25 @@ class TouristicObject extends ContentEntityBase implements TouristicObjectInterf
       ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
 
+    $fields['descriptif'] = BaseFieldDefinition::create('text_long')
+      ->setLabel(t('Descriptif Court'))
+      ->setTranslatable(TRUE)
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['type'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Type'))
+      ->setRequired(TRUE)
+      ->setSettings([
+        'allowed_values' => self::$type,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Publishing status'))
       ->setDescription(t('A boolean indicating whether the Touristic object is published.'))
-      ->setDefaultValue(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => -3,
-      ]);
+      ->setDefaultValue(TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

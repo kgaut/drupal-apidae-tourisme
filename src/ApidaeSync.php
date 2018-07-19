@@ -81,7 +81,11 @@ class ApidaeSync {
       $first += $data['query']['count'];
     }
 
-    \Drupal::logger('apidae')->error(t('Apidae sync over, @created objects created, @updated objects updated, @error errors', $results));
+    \Drupal::logger('apidae')->info(t('Apidae sync over, @created objects created, @updated objects updated, @error errors', [
+      '@created' => $results['created'],
+      '@updated' => $results['updated'],
+      '@error' => $results['error'],
+    ]));
   }
 
   protected function doQuery($first, $count) {
@@ -95,16 +99,7 @@ class ApidaeSync {
       'responseFields' => [
         'id',
         'nom',
-        'illustrations',
-        'multimedias',
-        'informations',
         'presentation',
-        'localisation',
-        '@informationsObjetTouristique',
-        'ouverture.periodeEnClair',
-        'ouverture.periodesOuvertures',
-        'descriptionTarif.tarifsEnClair.LibelleFr',
-        'contacts',
       ],
     ];
 
@@ -123,20 +118,55 @@ class ApidaeSync {
   }
 
   protected function parseOject($object, array &$results) {
-    if($objet = TouristicObject::load($object['id'])) {
-      $results['updated']++;
-    }
-    else {
+    $locales = array_diff($this->languages, ['fr']);
+    if(!$objet = TouristicObject::load($object['id'])) {
       $objet = TouristicObject::create([
         'id' => $object['id'],
+        'status' => 1,
+        'langcode' => 'fr',
+        'default_langcode' => FALSE,
         'name' => $object['nom']['libelleFr'],
+        'type' => $object['type'],
+        'descriptif' => $object['presentation']['descriptifCourt']['libelleFr'],
       ]);
-    }
-    if($objet->save()) {
-      $results['updated']++;
+      $objet->save();
+      foreach ($locales as $locale) {
+        $data = $objet->toArray();
+        $data['name'] = $object['nom']['libelle' . \ucwords($locale)];
+        $data['status'] = TRUE;
+        $data['descriptif'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
+        $objet->addTranslation($locale, $data);
+      }
+      if($objet->save()) {
+        $results['created']++;
+      }
+      else {
+        $results['error']++;
+      }
     }
     else {
-      $results['error']++;
+      $objet = $objet->getTranslation('fr');
+      $objet->setName($object['nom']['libelleFr']);
+      $objet->save();
+      foreach ($locales as $locale) {
+        if(!$objet->hasTranslation($locale)) {
+          $data = $objet->toArray();
+          $data['name'] = $object['nom']['libelle' . \ucwords($locale)];
+          $data['status'] = TRUE;
+          $data['descriptif'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
+          $objet->addTranslation($locale, $data);
+        }
+        else {
+          $translated = $objet->getTranslation($locale);
+          $translated->setName($object['nom']['libelle' . \ucwords($locale)]);
+        }
+      }
+      if($objet->save()) {
+        $results['created']++;
+      }
+      else {
+        $results['error']++;
+      }
     }
   }
 
