@@ -66,14 +66,21 @@ class ApidaeSync {
     $first = 0;
     $count = 20;
     $data['numFound'] = 1000;
+    $results = [
+      'created' => 0,
+      'updated' => 0,
+      'error' => 0,
+    ];
     while($data['numFound'] > $first) {
       $data = $this->doQuery($first, $count);
       foreach ($data['objetsTouristiques'] as $objetTouristique) {
-        $this->parseOject($objetTouristique);
+        $this->parseOject($objetTouristique, $results);
         unset($data['objetsTouristiques']);
       }
       $first += $data['query']['count'];
     }
+
+    \Drupal::logger('apidae')->error(t('Apidae sync over, @created objects created, @updated objects updated, @error errors', $results));
   }
 
   protected function doQuery($first, $count) {
@@ -100,9 +107,7 @@ class ApidaeSync {
     ];
 
     $url = self::$url . '?query=' . Json::encode($query);
-
     try {
-
       $response = $this->httpClient->get($url);
       $data = $response->getBody();
       return Json::decode($data);
@@ -115,10 +120,9 @@ class ApidaeSync {
     }
   }
 
-  protected function parseOject($object) {
+  protected function parseOject($object, array &$results) {
     if($objet = TouristicObject::load($object['id'])) {
-
-      dd('update ' . $objet->label());
+      $results['updated']++;
     }
     else {
       $objet = TouristicObject::create([
@@ -126,8 +130,13 @@ class ApidaeSync {
         'name' => $object['nom']['libelleFr'],
       ]);
     }
-    dd('creation ' . $object['nom']['libelleFr']);
-    $objet->save();
+    if($objet->save()) {
+      $results['updated']++;
+    }
+    else {
+      $results['error']++;
+    }
   }
+
 }
 
