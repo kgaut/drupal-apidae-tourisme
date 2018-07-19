@@ -51,6 +51,15 @@ class ApidaeConfigForm extends ConfigFormBase {
       '#default_value' => $config->get('selectionIds'),
       '#required' => TRUE,
     ];
+    $form['auth']['languages'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Code langues, séparés par une virgule'),
+      '#description' => $this->t('Ex : fr,es,en'),
+      '#maxlength' => 128,
+      '#size' => 64,
+      '#default_value' => $config->get('selectionIds'),
+      '#required' => TRUE,
+    ];
     $form['auth']['project_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Project ID'),
@@ -67,28 +76,6 @@ class ApidaeConfigForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Enable sync'),
       '#default_value' => $config->get('enabled'),
-    ];
-    $form['data']['objects'] = [
-      '#type' => 'checkboxes',
-      '#title' => $this->t('objects to syncronize'),
-      '#options' => [
-        'ACTIVITE' => $this->t('Activité'),
-        'COMMERCE_ET_SERVICE' => $this->t('Commerce et service'),
-        'DEGUSTATION' => $this->t('Producteur'),
-        'DOMAINE_SKIABLE' => $this->t('Domaine skiable'),
-        'EQUIPEMENT' => $this->t('Equipement'),
-        'FETE_ET_MANIFESTATION' => $this->t('Fête et manifestation'),
-        'HEBERGEMENT_COLLECTIF' => $this->t('Hébergement collectif'),
-        'HEBERGEMENT_LOCATIF' => $this->t('Hébergement locatif'),
-        'HOTELLERIE' => $this->t('Hôtellerie'),
-        'HOTELLERIE_PLEIN_AIR' => $this->t('Hôtellerie de plein air'),
-        'PATRIMOINE_CULTUREL' => $this->t('Patrimoine culturel'),
-        'PATRIMOINE_NATUREL' => $this->t('Patrimoine naturel'),
-        'RESTAURATION' => $this->t('Restauration'),
-        'SEJOUR_PACKAGE' => $this->t('Séjour packagé'),
-        'TERRITOIRE' => $this->t('Territoire'),
-      ],
-      '#default_value' => $config->get('objects'),
     ];
     return parent::buildForm($form, $form_state);
   }

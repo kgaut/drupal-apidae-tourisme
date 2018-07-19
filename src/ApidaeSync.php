@@ -36,7 +36,7 @@ class ApidaeSync {
 
   protected $apidaeApiKey;
 
-  protected $objects;
+  protected $languages;
 
   protected $territoireIds;
 
@@ -55,7 +55,7 @@ class ApidaeSync {
 
     $this->apidaeApiKey = $config['api_key'];
     $this->apidaeProjectId = $config['project_id'];
-    $this->objects = $config['objects'];
+    $this->languages = $config['languages'];
     $this->territoireIds = $config['territoireIds'];
 
     $this->lastUpdate = \Drupal::state()->get('apidae.last_sync', 0);
@@ -63,24 +63,21 @@ class ApidaeSync {
 
   public function sync() {
     \Drupal::state()->set('apidae.last_sync', date('U'));
-    foreach ($this->objects as $key => $objet) {
-      $first = 0;
-      $count = 20;
-      $data['numFound'] = 1000;
-      while($data['numFound'] > $first) {
-        $data = $this->doQuery($key, $first, $count);
-        foreach ($data['objetsTouristiques'] as $objetTouristique) {
-          $this->parseOject($objetTouristique);
-          unset($data['objetsTouristiques']);
-        }
-        $first += $data['query']['count'];
+    $first = 0;
+    $count = 20;
+    $data['numFound'] = 1000;
+    while($data['numFound'] > $first) {
+      $data = $this->doQuery($first, $count);
+      foreach ($data['objetsTouristiques'] as $objetTouristique) {
+        $this->parseOject($objetTouristique);
+        unset($data['objetsTouristiques']);
       }
+      $first += $data['query']['count'];
     }
   }
 
-  protected function doQuery($type, $first, $count) {
+  protected function doQuery($first, $count) {
     $query = [
-      'criteresQuery' => 'type:' . $type,
       'projetId'=> $this->apidaeProjectId,
       'apiKey'=> $this->apidaeApiKey,
       'selectionIds'=> $this->selectionIds,
