@@ -10,7 +10,5 @@
     "issues": "https://github.com/kgaut/drupal-apidae-tourisme/issues",
     "source": "https://github.com/kgaut/drupal-apidae-tourisme"
   },
-  "require": {
-    "drupal/geolocation":"^2.*"
-  }
+  "require": { }
 }
