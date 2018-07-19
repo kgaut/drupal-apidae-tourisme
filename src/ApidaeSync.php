@@ -38,7 +38,7 @@ class ApidaeSync {
 
   protected $languages;
 
-  protected $territoireIds;
+  protected $selectionIds;
 
   protected $lastUpdate = 0;
 
@@ -56,9 +56,10 @@ class ApidaeSync {
     $this->apidaeApiKey = $config['api_key'];
     $this->apidaeProjectId = $config['project_id'];
     $this->languages = $config['languages'];
-    $this->territoireIds = $config['territoireIds'];
+    $this->selectionIds = $config['selectionIds'];
 
     $this->lastUpdate = \Drupal::state()->get('apidae.last_sync', 0);
+    dd($this);exit;
   }
 
   public function sync() {
@@ -71,7 +72,7 @@ class ApidaeSync {
       'updated' => 0,
       'error' => 0,
     ];
-    while($data['numFound'] > $first) {
+    while($data['numFound'] > $first && $first < 20) {
       $data = $this->doQuery($first, $count);
       foreach ($data['objetsTouristiques'] as $objetTouristique) {
         $this->parseOject($objetTouristique, $results);
@@ -87,7 +88,8 @@ class ApidaeSync {
     $query = [
       'projetId'=> $this->apidaeProjectId,
       'apiKey'=> $this->apidaeApiKey,
-      'selectionIds'=> $this->selectionIds,
+      'selectionIds'=> explode($this->selectionIds, ','),
+      'locales'=> explode($this->languages, ','),
       'first' => $first,
       'count' => $count,
       'responseFields' => [
