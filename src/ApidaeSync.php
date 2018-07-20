@@ -120,6 +120,8 @@ class ApidaeSync {
 
   protected function parseOject($object, array &$results) {
     $locales = array_diff($this->languages, ['fr']);
+    \dd('---------------------------');
+    \dd($object);
     if(!$objet = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties(['type' => 'objet_touristique', 'field_id_ws' => $object['id']])) {
       $objet = Node::create([
         'field_id_ws' => $object['id'],
@@ -127,7 +129,8 @@ class ApidaeSync {
         'default_langcode' => TRUE,
         'title' => $object['nom']['libelleFr'],
         'type' => 'objet_touristique',
-        'body' => $object['presentation']['descriptifCourt']['libelleFr'],
+        'field_type' => $object['type'],
+        'field_description_courte' => $object['presentation']['descriptifCourt']['libelleFr'],
       ]);
       $objet->save();
       foreach ($locales as $locale) {
@@ -135,7 +138,7 @@ class ApidaeSync {
           $data = $objet->toArray();
           $data['title'] = $object['nom']['libelle' . \ucwords($locale)];
           $data['default_langcode'] = FALSE;
-          $data['body'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
+          $data['field_description_courte'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
           $objet->addTranslation($locale, $data);
         }
       }
@@ -149,17 +152,22 @@ class ApidaeSync {
     else {
       $objet = array_pop($objet);
       $objet->set('title', $object['nom']['libelleFr']);
+      $objet->set('field_description_courte', $object['presentation']['descriptifCourt']['libelleFr']);
       $objet->save();
       foreach ($locales as $locale) {
-        if(!$objet->hasTranslation($locale)) {
-          $data = $objet->toArray();
-          $data['title'] = $object['nom']['libelle' . \ucwords($locale)];
-          $data['body'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
-          $objet->addTranslation($locale, $data);
-        }
-        else {
-          $translated = $objet->getTranslation($locale);
-          $translated->set('title', $object['nom']['libelle' . \ucwords($locale)]);
+        if(isset($object['nom']['libelle' . \ucwords($locale)])) {
+          if(!$objet->hasTranslation($locale)) {
+            $data = $objet->toArray();
+            $data['title'] = $object['nom']['libelle' . \ucwords($locale)];
+            $data['field_description_courte'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
+            $objet->addTranslation($locale, $data);
+          }
+          else {
+            $translated = $objet->getTranslation($locale);
+            $objet->set('title', $object['nom']['libelle' . \ucwords($locale)]);
+            $objet->set('field_description_courte', $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)]);
+            $translated->set('field_description_courte', $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)]);
+          }
         }
       }
       if($objet->save()) {
