@@ -3,6 +3,7 @@
 namespace Drupal\apidae_tourisme;
 use Drupal\apidae_tourisme\Entity\TouristicObject;
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\Random;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\node\Entity\Node;
 use GuzzleHttp\ClientInterface;
@@ -43,6 +44,10 @@ class ApidaeSync {
 
   protected $lastUpdate = 0;
 
+  private static $count = 20;
+
+  private static $maxItemsPerBatch = 100;
+
   private static $url = "http://api.apidae-tourisme.com/api/v002/recherche/list-objets-touristiques";
 
   /**
@@ -66,7 +71,6 @@ class ApidaeSync {
   public function sync($forceUpdate = FALSE) {
     \Drupal::state()->set('apidae.last_sync', date('U'));
     $first = 0;
-    $count = 5;
     $data['numFound'] = 1000;
     $results = [
       'created' => 0,
@@ -74,8 +78,8 @@ class ApidaeSync {
       'error' => 0,
       'not_updated' => 0,
     ];
-    while($data['numFound'] > $first && $first < 5) {
-      $data = $this->doQuery($first, $count);
+    while($data['numFound'] > $first && $first < self::$maxItemsPerBatch) {
+      $data = $this->doQuery($first, self::$count);
       foreach ($data['objetsTouristiques'] as $objetTouristique) {
         $this->parseOject($objetTouristique, $results, $forceUpdate);
         unset($data['objetsTouristiques']);
@@ -92,6 +96,8 @@ class ApidaeSync {
   }
 
   protected function doQuery($first, $count) {
+
+    $random = new Random();
     $query = [
       'projetId'=> $this->apidaeProjectId,
       'apiKey'=> $this->apidaeApiKey,
@@ -99,6 +105,8 @@ class ApidaeSync {
       'locales'=> $this->languages,
       'first' => $first,
       'count' => $count,
+      'order' => 'RANDOM',
+      'randomSeed' => $random->word('20'),
       'responseFields' => [
         'id',
         'nom',
@@ -127,7 +135,6 @@ class ApidaeSync {
 
   protected function parseOject($object, array &$results, $forceUpdate = FALSE) {
     $modificationDate = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $object['gestion']['dateModification']);
-    dd($object);
     $locales = array_diff($this->languages, ['fr']);
     if(!$objet = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties(['type' => 'objet_touristique', 'field_id_ws' => $object['id']])) {
       $objet = Node::create([
