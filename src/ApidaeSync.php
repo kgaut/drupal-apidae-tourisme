@@ -287,7 +287,7 @@ class ApidaeSync {
 
   private function getMedias($object) {
     $files = [];
-    if(is_array($object['illustrations'])) {
+    if(isset($object['illustrations']) && is_array($object['illustrations'])) {
       foreach ($object['illustrations'] as $illu) {
         $modificationDate = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $illu['traductionFichiers'][0]['lastModifiedDate']);
         $url = $illu['traductionFichiers'][0]['url'];
