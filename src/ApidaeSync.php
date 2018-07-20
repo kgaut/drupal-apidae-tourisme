@@ -1,7 +1,6 @@
 <?php
 
 namespace Drupal\apidae_tourisme;
-use Drupal\apidae_tourisme\Entity\TouristicObject;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -86,12 +85,12 @@ class ApidaeSync {
       }
       $first += $data['query']['count'];
     }
-
-    \Drupal::logger('apidae')->info(t('Apidae sync over, @created objects created, @updated objects updated, @not_updated objects unchanged, @error errors', [
+    \Drupal::logger('apidae')->info(t('Sync over, @created created, @updated updated, @not_updated unchanged, @error errors, @num_results results', [
       '@created' => $results['created'],
       '@updated' => $results['updated'],
       '@error' => $results['error'],
       '@not_updated' => $results['not_updated'],
+      '@num_results' => $data['numFound'],
     ]));
   }
 
@@ -111,7 +110,7 @@ class ApidaeSync {
         'id',
         'nom',
         'localisation',
-        'presentation.descriptifCourt',
+        'presentation',
         'descriptionTarif.tarifsEnClair',
         'informations.moyensCommunication',
         'illustrations',
@@ -133,30 +132,32 @@ class ApidaeSync {
     }
   }
 
-  protected function parseOject($object, array &$results, $forceUpdate = FALSE) {
-    $modificationDate = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $object['gestion']['dateModification']);
+  protected function parseOject($apidaeObject, array &$results, $forceUpdate = FALSE) {
+    $modificationDate = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $apidaeObject['gestion']['dateModification']);
     $locales = array_diff($this->languages, ['fr']);
-    if(!$objet = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties(['type' => 'objet_touristique', 'field_id_ws' => $object['id']])) {
+    if(!$objet = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties(['type' => 'objet_touristique', 'field_id_ws' => $apidaeObject['id']])) {
       $objet = Node::create([
-        'field_id_ws' => $object['id'],
+        'field_id_ws' => $apidaeObject['id'],
         'langcode' => 'fr',
         'default_langcode' => TRUE,
-        'title' => $object['nom']['libelleFr'],
+        'title' => $apidaeObject['nom']['libelleFr'],
         'type' => 'objet_touristique',
-        'field_type' => $object['type'],
-        'field_description_courte' => $object['presentation']['descriptifCourt']['libelleFr'],
-        'field_phone' => $this->getPhoneFromObject($object),
-        'field_email' => $this->getMailFromObject($object),
-        'field_illustrations' => $this->getMedias($object),
-        'field_geolocation' => $this->getGeolocalisation($object),
+        'field_type' => $apidaeObject['type'],
+        'field_description' => $this->getDescription($apidaeObject),
+        'field_description_courte' =>  $this->getDescriptionCourte($apidaeObject),
+        'field_phone' => $this->getPhoneFromObject($apidaeObject),
+        'field_email' => $this->getMailFromObject($apidaeObject),
+        'field_illustrations' => $this->getMedias($apidaeObject),
+        'field_geolocation' => $this->getGeolocalisation($apidaeObject),
       ]);
       $objet->save();
       foreach ($locales as $locale) {
-        if(isset($object['nom']['libelle' . \ucwords($locale)])) {
+        if(isset($apidaeObject['nom']['libelle' . \ucwords($locale)])) {
           $data = $objet->toArray();
-          $data['title'] = $object['nom']['libelle' . \ucwords($locale)];
+          $data['title'] = $apidaeObject['nom']['libelle' . \ucwords($locale)];
           $data['default_langcode'] = FALSE;
-          $data['field_description_courte'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
+          $data['field_description_courte'] = $this->getDescriptionCourte($apidaeObject, $locale);
+          $data['field_description'] = $this->getDescription($apidaeObject, $locale);
           $objet->addTranslation($locale, $data);
         }
       }
@@ -174,36 +175,49 @@ class ApidaeSync {
         $results['not_updated']++;
         return;
       }
-      $objet->set('title', $object['nom']['libelleFr']);
-      $objet->set('field_description_courte', $object['presentation']['descriptifCourt']['libelleFr']);
-      $objet->set('field_phone', $this->getPhoneFromObject($object));
-      $objet->set('field_illustrations', $this->getMedias($object));
-      $objet->set('field_geolocation', $this->getGeolocalisation($object));
-      $objet->set('field_email', $this->getMailFromObject($object));
+      $objet->set('title', $apidaeObject['nom']['libelleFr']);
+      $objet->set('field_description_courte', $this->getDescriptionCourte($apidaeObject, 'fr'));
+      $objet->set('field_description', $this->getDescription($apidaeObject, 'fr'));
+      $objet->set('field_phone', $this->getPhoneFromObject($apidaeObject));
+      $objet->set('field_illustrations', $this->getMedias($apidaeObject));
+      $objet->set('field_geolocation', $this->getGeolocalisation($apidaeObject));
+      $objet->set('field_email', $this->getMailFromObject($apidaeObject));
+      $objet->set('field_website', $this->getWebsiteFromObject($apidaeObject));
       $objet->save();
       foreach ($locales as $locale) {
-        if(isset($object['nom']['libelle' . \ucwords($locale)])) {
-          if(!$objet->hasTranslation($locale)) {
+        if(isset($apidaeObject['nom']['libelle' . \ucwords($locale)])) {
+          if ($objet->hasTranslation($locale)) {
+            $objet->removeTranslation($locale);
             $data = $objet->toArray();
-            $data['title'] = $object['nom']['libelle' . \ucwords($locale)];
-            $data['field_description_courte'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
+            $data['title'][0]['value'] = $apidaeObject['nom']['libelle' . \ucwords($locale)];
+            $data['field_description'][0]['value'] = $this->getDescription($apidaeObject, $locale);
+            $data['field_description_courte'][0]['value'] = $this->getDescriptionCourte($apidaeObject, $locale);
             $objet->addTranslation($locale, $data);
-          }
-          else {
-            $translated = $objet->getTranslation($locale);
-            $objet->set('title', $object['nom']['libelle' . \ucwords($locale)]);
-            $objet->set('field_description_courte', $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)]);
-            $translated->set('field_description_courte', $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)]);
           }
         }
       }
       if($objet->save()) {
-        $results['created']++;
+        $results['updated']++;
       }
       else {
         $results['error']++;
       }
     }
+  }
+
+  private function getDescriptionCourte($object, $locale='fr') {
+    if(isset($object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)])) {
+      return $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
+    }
+    return NULL;
+  }
+
+
+  private function getDescription($object, $locale='fr') {
+    if(isset($object['presentation']['descriptifsThematises'][0]['description']['libelle' . \ucwords($locale)])) {
+      return $object['presentation']['descriptifsThematises'][0]['description']['libelle' . \ucwords($locale)];
+    }
+    return NULL;
   }
 
   private function getPhoneFromObject($object, $locale='fr') {
@@ -224,6 +238,15 @@ class ApidaeSync {
     return NULL;
   }
 
+  private function getWebsiteFromObject($object, $locale='fr') {
+    foreach ($object['informations']['moyensCommunication'] as $moyen) {
+      if ($moyen['type']['id'] === 205 && isset($moyen['coordonnees'][$locale])) {
+        return $moyen['coordonnees'][$locale];
+      }
+    }
+    return NULL;
+  }
+
   private function getGeolocalisation($object) {
     if(isset($object['localisation']['geolocalisation']['geoJson']['coordinates'])) {
       return [
@@ -238,14 +261,19 @@ class ApidaeSync {
     $files = [];
     if(is_array($object['illustrations'])) {
       foreach ($object['illustrations'] as $illu) {
+        $modificationDate = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $illu['traductionFichiers'][0]['lastModifiedDate']);
         $url = $illu['traductionFichiers'][0]['url'];
         $title = $illu['nom']['libelleFr'];
         $filename = basename($url);
-        $folder = 'public://objets_touristiques/' . date('Y-m') . '/';
+        $folder = 'public://objets_touristiques/' . $modificationDate->format('Y-m') . '/';
+        $destination = $folder . $filename;
+        if (file_exists($destination) && $existingFiles = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $destination])) {
+          $files[] = array_pop($existingFiles);
+          continue;
+        }
         if(!is_dir($folder)) {
           \Drupal::service('file_system')->mkdir($folder, NULL, TRUE);
         }
-        $destination = $folder . $filename;
         if($data = file_get_contents($url)) {
           $file = file_save_data($data, $destination, FILE_EXISTS_REPLACE);
           $file->save();
@@ -254,6 +282,11 @@ class ApidaeSync {
             'alt' => $title,
             'title' => $title,
           ];
+        }
+        else {
+          \Drupal::logger('apidae')->error(t('Problem getting @url file', [
+            '@url' => $url,
+          ]));
         }
 
       }
