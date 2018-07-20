@@ -1,7 +1,9 @@
 <?php
 
 function apidae_tourisme_cron() {
-  /** @var \Drupal\apidae_tourisme\ApidaeSync $apidaeService */
-  $apidaeService = \Drupal::service('apidae_toursime.sync');
-  $apidaeService->sync();
+  if (\Drupal::config('apidae_tourisme.config')->get('enabled')) {
+    /** @var \Drupal\apidae_tourisme\ApidaeSync $apidaeService */
+    $apidaeService = \Drupal::service('apidae_toursime.sync');
+    $apidaeService->sync();
+  }
 }

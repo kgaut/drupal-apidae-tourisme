@@ -3,3 +3,5 @@ type: module
 description: "Module Drupal 8 d'interfacage avec l'API Apidae"
 core: 8.x
 package: Web services
+dependencies:
+  - content_translation
