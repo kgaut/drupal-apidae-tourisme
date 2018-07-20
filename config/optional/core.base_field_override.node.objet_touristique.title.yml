@@ -1,0 +1,18 @@
+uuid: 8619cc26-859f-4164-9d0e-3523e147ddb7
+langcode: fr
+status: true
+dependencies:
+  config:
+    - node.type.objet_touristique
+id: node.objet_touristique.title
+field_name: title
+entity_type: node
+bundle: objet_touristique
+label: Nom
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

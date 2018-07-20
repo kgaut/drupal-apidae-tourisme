@@ -4,6 +4,7 @@ namespace Drupal\apidae_tourisme;
 use Drupal\apidae_tourisme\Entity\TouristicObject;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\node\Entity\Node;
 use GuzzleHttp\ClientInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
@@ -65,7 +66,7 @@ class ApidaeSync {
   public function sync() {
     \Drupal::state()->set('apidae.last_sync', date('U'));
     $first = 0;
-    $count = 20;
+    $count = 5;
     $data['numFound'] = 1000;
     $results = [
       'created' => 0,
@@ -119,23 +120,24 @@ class ApidaeSync {
 
   protected function parseOject($object, array &$results) {
     $locales = array_diff($this->languages, ['fr']);
-    if(!$objet = TouristicObject::load($object['id'])) {
-      $objet = TouristicObject::create([
-        'id' => $object['id'],
-        'status' => 1,
+    if(!$objet = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties(['type' => 'objet_touristique', 'field_id_ws' => $object['id']])) {
+      $objet = Node::create([
+        'field_id_ws' => $object['id'],
         'langcode' => 'fr',
-        'default_langcode' => FALSE,
-        'name' => $object['nom']['libelleFr'],
-        'type' => $object['type'],
-        'descriptif' => $object['presentation']['descriptifCourt']['libelleFr'],
+        'default_langcode' => TRUE,
+        'title' => $object['nom']['libelleFr'],
+        'type' => 'objet_touristique',
+        'body' => $object['presentation']['descriptifCourt']['libelleFr'],
       ]);
       $objet->save();
       foreach ($locales as $locale) {
-        $data = $objet->toArray();
-        $data['name'] = $object['nom']['libelle' . \ucwords($locale)];
-        $data['status'] = TRUE;
-        $data['descriptif'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
-        $objet->addTranslation($locale, $data);
+        if(isset($object['nom']['libelle' . \ucwords($locale)])) {
+          $data = $objet->toArray();
+          $data['title'] = $object['nom']['libelle' . \ucwords($locale)];
+          $data['default_langcode'] = FALSE;
+          $data['body'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
+          $objet->addTranslation($locale, $data);
+        }
       }
       if($objet->save()) {
         $results['created']++;
@@ -145,20 +147,19 @@ class ApidaeSync {
       }
     }
     else {
-      $objet = $objet->getTranslation('fr');
-      $objet->setName($object['nom']['libelleFr']);
+      $objet = array_pop($objet);
+      $objet->set('title', $object['nom']['libelleFr']);
       $objet->save();
       foreach ($locales as $locale) {
         if(!$objet->hasTranslation($locale)) {
           $data = $objet->toArray();
-          $data['name'] = $object['nom']['libelle' . \ucwords($locale)];
-          $data['status'] = TRUE;
-          $data['descriptif'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
+          $data['title'] = $object['nom']['libelle' . \ucwords($locale)];
+          $data['body'] = $object['presentation']['descriptifCourt']['libelle' . \ucwords($locale)];
           $objet->addTranslation($locale, $data);
         }
         else {
           $translated = $objet->getTranslation($locale);
-          $translated->setName($object['nom']['libelle' . \ucwords($locale)]);
+          $translated->set('title', $object['nom']['libelle' . \ucwords($locale)]);
         }
       }
       if($objet->save()) {

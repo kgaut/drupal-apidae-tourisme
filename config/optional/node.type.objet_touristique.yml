@@ -1,0 +1,17 @@
+uuid: dab4a849-6e46-4e0d-8742-7b1665fd60ad
+langcode: fr
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus: {  }
+    parent: ''
+name: 'Objet Touristique'
+type: objet_touristique
+description: ''
+help: ''
+new_revision: false
+preview_mode: 0
+display_submitted: false

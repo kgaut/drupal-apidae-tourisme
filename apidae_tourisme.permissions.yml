@@ -2,22 +2,3 @@ configure apidae:
   title: 'Configure Apidae settings'
   description: 'Configure authentification to Apidae webservices'
   restrict access: true
-add touristic object entities:
-  title: 'Create new Touristic object entities'
-
-administer touristic object entities:
-  title: 'Administer Touristic object entities'
-  description: 'Allow to access the administration form to configure Touristic object entities.'
-  restrict access: true
-
-delete touristic object entities:
-  title: 'Delete Touristic object entities'
-
-edit touristic object entities:
-  title: 'Edit Touristic object entities'
-
-view published touristic object entities:
-  title: 'View published Touristic object entities'
-
-view unpublished touristic object entities:
-  title: 'View unpublished Touristic object entities'
