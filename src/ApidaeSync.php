@@ -125,7 +125,6 @@ class ApidaeSync {
 
   protected function parseOject($object, array &$results) {
     $locales = array_diff($this->languages, ['fr']);
-    dd($this->getGeolocalisation($object));
     if(!$objet = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties(['type' => 'objet_touristique', 'field_id_ws' => $object['id']])) {
       $objet = Node::create([
         'field_id_ws' => $object['id'],
@@ -136,6 +135,7 @@ class ApidaeSync {
         'field_type' => $object['type'],
         'field_description_courte' => $object['presentation']['descriptifCourt']['libelleFr'],
         'field_phone' => $this->getPhoneFromObject($object),
+        'field_illustrations' => $this->getMedias($object),
       ]);
       $objet->save();
       foreach ($locales as $locale) {
@@ -159,6 +159,7 @@ class ApidaeSync {
       $objet->set('title', $object['nom']['libelleFr']);
       $objet->set('field_description_courte', $object['presentation']['descriptifCourt']['libelleFr']);
       $objet->set('field_phone', $this->getPhoneFromObject($object));
+      $objet->set('field_illustrations', $this->getMedias($object));
       $objet->save();
       foreach ($locales as $locale) {
         if(isset($object['nom']['libelle' . \ucwords($locale)])) {
@@ -202,6 +203,34 @@ class ApidaeSync {
       ];
     }
     return NULL;
+  }
+
+  private function getMedias($object) {
+    $files = [];
+    if(is_array($object['illustrations'])) {
+      foreach ($object['illustrations'] as $illu) {
+        $url = $illu['traductionFichiers'][0]['url'];
+        $title = $illu['nom']['libelleFr'];
+        $filename = basename($url);
+        $folder = 'public://objets_touristiques/'.date('Y-m') . '/';
+        if(!is_dir($folder)) {
+          \Drupal::service('file_system')->mkdir($folder, NULL, TRUE);
+        }
+        $destination = $folder . $filename;
+        if($data = file_get_contents($url)) {
+          $file = file_save_data($data, $destination, FILE_EXISTS_REPLACE);
+          $file->save();
+          $files[] = [
+            'target_id' => $file->id(),
+            'alt' => $title,
+            'title' => $title,
+          ];
+        }
+
+      }
+    }
+    dd($files);
+    return $files;
   }
 
 }
