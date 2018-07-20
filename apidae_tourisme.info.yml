@@ -2,4 +2,4 @@ name: 'Apidae Tourisme'
 type: module
 description: "Module Drupal 8 d'interfacage avec l'API Apidae"
 core: 8.x
-package: 'services'
+package: Web services
