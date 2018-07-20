@@ -1,0 +1,66 @@
+uuid: 6f6ca455-50f4-4cf0-8702-fd3836a9c3d7
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_type
+field_name: field_type
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: ACTIVITE
+      label: Activité
+    -
+      value: COMMERCE_ET_SERVICE
+      label: 'Commerce et service'
+    -
+      value: DEGUSTATION
+      label: Producteur
+    -
+      value: DOMAINE_SKIABLE
+      label: 'Domaine skiable'
+    -
+      value: EQUIPEMENT
+      label: Equipement
+    -
+      value: FETE_ET_MANIFESTATION
+      label: 'Fête et manifestation'
+    -
+      value: HEBERGEMENT_COLLECTIF
+      label: 'Hébergement collectif'
+    -
+      value: HEBERGEMENT_LOCATIF
+      label: 'Hébergement locatif'
+    -
+      value: HOTELLERIE
+      label: Hôtellerie
+    -
+      value: HOTELLERIE_PLEIN_AIR
+      label: 'Hôtellerie de plein air'
+    -
+      value: PATRIMOINE_CULTUREL
+      label: 'Patrimoine culturel'
+    -
+      value: PATRIMOINE_NATUREL
+      label: 'Patrimoine naturel'
+    -
+      value: RESTAURATION
+      label: Restauration
+    -
+      value: SEJOUR_PACKAGE
+      label: 'Séjour packagé'
+    -
+      value: TERRITOIRE
+      label: Territoire
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

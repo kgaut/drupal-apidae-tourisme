@@ -146,6 +146,7 @@ class ApidaeSync {
         'field_type' => $object['type'],
         'field_description_courte' => $object['presentation']['descriptifCourt']['libelleFr'],
         'field_phone' => $this->getPhoneFromObject($object),
+        'field_email' => $this->getMailFromObject($object),
         'field_illustrations' => $this->getMedias($object),
         'field_geolocation' => $this->getGeolocalisation($object),
       ]);
@@ -169,7 +170,7 @@ class ApidaeSync {
     else {
       /** @var Node $objet */
       $objet = array_pop($objet);
-      if(!$force && $objet->getChangedTime() > $modificationDate->format('U')) {
+      if(!$forceUpdate && $objet->getChangedTime() > $modificationDate->format('U')) {
         $results['not_updated']++;
         return;
       }
@@ -178,6 +179,7 @@ class ApidaeSync {
       $objet->set('field_phone', $this->getPhoneFromObject($object));
       $objet->set('field_illustrations', $this->getMedias($object));
       $objet->set('field_geolocation', $this->getGeolocalisation($object));
+      $objet->set('field_email', $this->getMailFromObject($object));
       $objet->save();
       foreach ($locales as $locale) {
         if(isset($object['nom']['libelle' . \ucwords($locale)])) {
@@ -207,6 +209,15 @@ class ApidaeSync {
   private function getPhoneFromObject($object, $locale='fr') {
     foreach ($object['informations']['moyensCommunication'] as $moyen) {
       if ($moyen['type']['id'] === 201 && isset($moyen['coordonnees'][$locale])) {
+        return $moyen['coordonnees'][$locale];
+      }
+    }
+    return NULL;
+  }
+
+  private function getMailFromObject($object, $locale='fr') {
+    foreach ($object['informations']['moyensCommunication'] as $moyen) {
+      if ($moyen['type']['id'] === 204 && isset($moyen['coordonnees'][$locale])) {
         return $moyen['coordonnees'][$locale];
       }
     }

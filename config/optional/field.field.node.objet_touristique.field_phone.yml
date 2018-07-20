@@ -1,0 +1,21 @@
+uuid: ad70fa95-ffdd-48c3-80cb-a1f4f57565cf
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_phone
+    - node.type.objet_touristique
+  module:
+    - telephone
+id: node.objet_touristique.field_phone
+field_name: field_phone
+entity_type: node
+bundle: objet_touristique
+label: Téléphone
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: telephone

@@ -8,6 +8,8 @@ third_party_settings:
   menu_ui:
     available_menus: {  }
     parent: ''
+_core:
+  default_config_hash: tYCUKxAQMqZKHFOS1OsDFNXxInTXikl5VQa5OI1jXOM
 name: 'Objet Touristique'
 type: objet_touristique
 description: ''
