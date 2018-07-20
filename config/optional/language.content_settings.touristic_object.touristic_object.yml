@@ -1,0 +1,17 @@
+uuid: 2aebf06d-319d-48f7-9585-b69b37f21443
+langcode: fr
+status: true
+dependencies:
+  module:
+    - apidae_tourisme
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+    bundle_settings:
+      untranslatable_fields_hide: '0'
+id: touristic_object.touristic_object
+target_entity_type_id: touristic_object
+target_bundle: touristic_object
+default_langcode: site_default
+language_alterable: true

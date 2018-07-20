@@ -1,0 +1,22 @@
+uuid: c422735a-89e8-4137-b2de-6019e6f906be
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.objet_touristique
+  module:
+    - text
+id: node.objet_touristique.body
+field_name: body
+entity_type: node
+bundle: objet_touristique
+label: Body
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: true
+field_type: text_with_summary

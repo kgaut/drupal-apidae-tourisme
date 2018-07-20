@@ -1,0 +1,23 @@
+uuid: 4662f20b-f395-4a0a-9a50-dcd6c7019fb9
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_id_ws
+    - node.type.objet_touristique
+id: node.objet_touristique.field_id_ws
+field_name: field_id_ws
+entity_type: node
+bundle: objet_touristique
+label: 'ID WS'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

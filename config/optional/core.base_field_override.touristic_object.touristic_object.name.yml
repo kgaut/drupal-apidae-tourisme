@@ -1,0 +1,20 @@
+uuid: dc7d564d-4e9e-4869-ae16-44604909f527
+langcode: fr
+status: true
+dependencies:
+  module:
+    - apidae_tourisme
+id: touristic_object.touristic_object.name
+field_name: name
+entity_type: touristic_object
+bundle: touristic_object
+label: Name
+description: 'The name of the Touristic object entity.'
+required: true
+translatable: true
+default_value:
+  -
+    value: ''
+default_value_callback: ''
+settings: {  }
+field_type: string
