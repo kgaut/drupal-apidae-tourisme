@@ -63,7 +63,7 @@ class ApidaeSync {
 
   }
 
-  public function sync() {
+  public function sync($forceUpdate = FALSE) {
     \Drupal::state()->set('apidae.last_sync', date('U'));
     $first = 0;
     $count = 5;
@@ -77,7 +77,7 @@ class ApidaeSync {
     while($data['numFound'] > $first && $first < 5) {
       $data = $this->doQuery($first, $count);
       foreach ($data['objetsTouristiques'] as $objetTouristique) {
-        $this->parseOject($objetTouristique, $results);
+        $this->parseOject($objetTouristique, $results, $forceUpdate);
         unset($data['objetsTouristiques']);
       }
       $first += $data['query']['count'];
@@ -125,7 +125,7 @@ class ApidaeSync {
     }
   }
 
-  protected function parseOject($object, array &$results, $force = FALSE) {
+  protected function parseOject($object, array &$results, $forceUpdate = FALSE) {
     $modificationDate = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $object['gestion']['dateModification']);
     dd($object);
     $locales = array_diff($this->languages, ['fr']);
@@ -162,7 +162,7 @@ class ApidaeSync {
     else {
       /** @var Node $objet */
       $objet = array_pop($objet);
-      if($objet->getChangedTime() > $modificationDate->format('U') && !$force) {
+      if(!$force && $objet->getChangedTime() > $modificationDate->format('U')) {
         $results['not_updated']++;
         return;
       }
@@ -206,9 +206,9 @@ class ApidaeSync {
     return NULL;
   }
 
-  private function getGeolocalisation($object, $locale='fr') {
-    if(isset(($object['localisation']['geolocalisation']['geoJson']['coordinates']))) {
-      return  [
+  private function getGeolocalisation($object) {
+    if(isset($object['localisation']['geolocalisation']['geoJson']['coordinates'])) {
+      return [
         'lat' => $object['localisation']['geolocalisation']['geoJson']['coordinates'][0],
         'lng' => $object['localisation']['geolocalisation']['geoJson']['coordinates'][1],
       ];
@@ -223,7 +223,7 @@ class ApidaeSync {
         $url = $illu['traductionFichiers'][0]['url'];
         $title = $illu['nom']['libelleFr'];
         $filename = basename($url);
-        $folder = 'public://objets_touristiques/'.date('Y-m') . '/';
+        $folder = 'public://objets_touristiques/' . date('Y-m') . '/';
         if(!is_dir($folder)) {
           \Drupal::service('file_system')->mkdir($folder, NULL, TRUE);
         }
