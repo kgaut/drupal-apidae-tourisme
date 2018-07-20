@@ -1,15 +1,15 @@
-uuid: 8d981775-bcd9-4230-9625-f7fdd499faf8
+uuid: 3b379af8-fc80-4cb1-93ca-6dc73933cc54
 langcode: fr
 status: true
 dependencies:
   config:
-    - field.storage.node.field_description_courte
+    - field.storage.node.field_description
     - node.type.objet_touristique
-id: node.objet_touristique.field_description_courte
-field_name: field_description_courte
+id: node.objet_touristique.field_description
+field_name: field_description
 entity_type: node
 bundle: objet_touristique
-label: 'description courte'
+label: Description
 description: ''
 required: false
 translatable: true

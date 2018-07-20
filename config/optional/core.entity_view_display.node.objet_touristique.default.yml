@@ -1,0 +1,116 @@
+uuid: cc6d672f-dd0a-4163-bbf8-13bf34601ba9
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.objet_touristique.field_address
+    - field.field.node.objet_touristique.field_description
+    - field.field.node.objet_touristique.field_description_courte
+    - field.field.node.objet_touristique.field_email
+    - field.field.node.objet_touristique.field_geolocation
+    - field.field.node.objet_touristique.field_id_ws
+    - field.field.node.objet_touristique.field_illustrations
+    - field.field.node.objet_touristique.field_phone
+    - field.field.node.objet_touristique.field_type
+    - field.field.node.objet_touristique.field_website
+    - node.type.objet_touristique
+  module:
+    - address
+    - geolocation
+    - image
+    - link
+    - options
+    - telephone
+    - user
+id: node.objet_touristique.default
+targetEntityType: node
+bundle: objet_touristique
+mode: default
+content:
+  field_address:
+    weight: 110
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: address_default
+    region: content
+  field_description:
+    weight: 109
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_description_courte:
+    weight: 102
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_email:
+    weight: 107
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_geolocation:
+    weight: 106
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: geolocation_latlng
+    region: content
+  field_id_ws:
+    weight: 101
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    type: number_integer
+    region: content
+  field_illustrations:
+    weight: 105
+    label: above
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+    type: image
+    region: content
+  field_phone:
+    weight: 104
+    label: above
+    settings:
+      title: ''
+    third_party_settings: {  }
+    type: telephone_link
+    region: content
+  field_type:
+    weight: 103
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+    region: content
+  field_website:
+    weight: 108
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+    region: content
+  links:
+    weight: 100
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  langcode: true

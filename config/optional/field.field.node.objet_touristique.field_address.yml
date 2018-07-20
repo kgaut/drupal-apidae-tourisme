@@ -1,0 +1,40 @@
+uuid: 0212c46a-b413-4fb4-ad22-9aa468645864
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_address
+    - node.type.objet_touristique
+  module:
+    - address
+id: node.objet_touristique.field_address
+field_name: field_address
+entity_type: node
+bundle: objet_touristique
+label: Adresse
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  available_countries:
+    FR: FR
+  langcode_override: ''
+  field_overrides:
+    givenName:
+      override: hidden
+    additionalName:
+      override: hidden
+    familyName:
+      override: hidden
+    organization:
+      override: hidden
+    sortingCode:
+      override: hidden
+    dependentLocality:
+      override: hidden
+    administrativeArea:
+      override: hidden
+  fields: {  }
+field_type: address
