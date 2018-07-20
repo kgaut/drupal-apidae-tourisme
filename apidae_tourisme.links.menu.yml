@@ -6,7 +6,7 @@ apidae_tourisme.apidae_config_form:
   weight: 99
 
 entity.objets_tourisques.collection:
-  title: 'Objets tourstiques'
+  title: 'Objets touristiques'
   route_name: view.objets_tourisques.page
   parent: system.admin_content
   weight: 1
