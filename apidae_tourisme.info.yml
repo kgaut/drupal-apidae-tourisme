@@ -7,3 +7,4 @@ dependencies:
   - content_translation
   - telephone
   - geolocation
+  - address

@@ -149,6 +149,7 @@ class ApidaeSync {
         'field_email' => $this->getMailFromObject($apidaeObject),
         'field_illustrations' => $this->getMedias($apidaeObject),
         'field_geolocation' => $this->getGeolocalisation($apidaeObject),
+        'field_address' => $this->getAddress($apidaeObject),
       ]);
       $objet->save();
       foreach ($locales as $locale) {
@@ -169,6 +170,7 @@ class ApidaeSync {
       }
     }
     else {
+      dd($this->getAddress($apidaeObject));
       /** @var Node $objet */
       $objet = array_pop($objet);
       if(!$forceUpdate && $objet->getChangedTime() > $modificationDate->format('U')) {
@@ -183,6 +185,7 @@ class ApidaeSync {
       $objet->set('field_geolocation', $this->getGeolocalisation($apidaeObject));
       $objet->set('field_email', $this->getMailFromObject($apidaeObject));
       $objet->set('field_website', $this->getWebsiteFromObject($apidaeObject));
+      $objet->set('field_address', $this->getAddress($apidaeObject));
       $objet->save();
       foreach ($locales as $locale) {
         if(isset($apidaeObject['nom']['libelle' . \ucwords($locale)])) {
@@ -255,6 +258,20 @@ class ApidaeSync {
       ];
     }
     return NULL;
+  }
+
+  private function getAddress($object) {
+    if(isset($object['localisation']['adresse'])) {
+      return [
+        'country_code' => 'FR',
+        'address_line1' => $object['localisation']['adresse']['adresse1'],
+        'address_line2' => $object['localisation']['adresse']['adresse2'],
+        'locality' => $object['localisation']['adresse']['commune']['nom'],
+        'postal_code' => $object['localisation']['adresse']['commune']['codePostal'],
+      ];
+    }
+    return NULL;
+
   }
 
   private function getMedias($object) {
