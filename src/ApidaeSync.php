@@ -136,6 +136,7 @@ class ApidaeSync {
         'field_description_courte' => $object['presentation']['descriptifCourt']['libelleFr'],
         'field_phone' => $this->getPhoneFromObject($object),
         'field_illustrations' => $this->getMedias($object),
+        'field_geolocation' => $this->getGeolocalisation($object),
       ]);
       $objet->save();
       foreach ($locales as $locale) {
@@ -160,6 +161,7 @@ class ApidaeSync {
       $objet->set('field_description_courte', $object['presentation']['descriptifCourt']['libelleFr']);
       $objet->set('field_phone', $this->getPhoneFromObject($object));
       $objet->set('field_illustrations', $this->getMedias($object));
+      $objet->set('field_geolocation', $this->getGeolocalisation($object));
       $objet->save();
       foreach ($locales as $locale) {
         if(isset($object['nom']['libelle' . \ucwords($locale)])) {
