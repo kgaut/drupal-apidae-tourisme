@@ -72,6 +72,7 @@ class ApidaeSync {
       'created' => 0,
       'updated' => 0,
       'error' => 0,
+      'not_updated' => 0,
     ];
     while($data['numFound'] > $first && $first < 5) {
       $data = $this->doQuery($first, $count);
@@ -82,10 +83,11 @@ class ApidaeSync {
       $first += $data['query']['count'];
     }
 
-    \Drupal::logger('apidae')->info(t('Apidae sync over, @created objects created, @updated objects updated, @error errors', [
+    \Drupal::logger('apidae')->info(t('Apidae sync over, @created objects created, @updated objects updated, @not_updated objects unchanged, @error errors', [
       '@created' => $results['created'],
       '@updated' => $results['updated'],
       '@error' => $results['error'],
+      '@not_updated' => $results['not_updated'],
     ]));
   }
 
@@ -105,7 +107,7 @@ class ApidaeSync {
         'descriptionTarif.tarifsEnClair',
         'informations.moyensCommunication',
         'illustrations',
-        'multimedias',
+        'gestion.dateModification',
       ],
     ];
 
@@ -123,7 +125,9 @@ class ApidaeSync {
     }
   }
 
-  protected function parseOject($object, array &$results) {
+  protected function parseOject($object, array &$results, $force = FALSE) {
+    $modificationDate = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $object['gestion']['dateModification']);
+    dd($object);
     $locales = array_diff($this->languages, ['fr']);
     if(!$objet = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties(['type' => 'objet_touristique', 'field_id_ws' => $object['id']])) {
       $objet = Node::create([
@@ -156,7 +160,12 @@ class ApidaeSync {
       }
     }
     else {
+      /** @var Node $objet */
       $objet = array_pop($objet);
+      if($objet->getChangedTime() > $modificationDate->format('U') && !$force) {
+        $results['not_updated']++;
+        return;
+      }
       $objet->set('title', $object['nom']['libelleFr']);
       $objet->set('field_description_courte', $object['presentation']['descriptifCourt']['libelleFr']);
       $objet->set('field_phone', $this->getPhoneFromObject($object));
@@ -231,7 +240,6 @@ class ApidaeSync {
 
       }
     }
-    dd($files);
     return $files;
   }
 
