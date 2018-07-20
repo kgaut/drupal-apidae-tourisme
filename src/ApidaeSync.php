@@ -67,7 +67,7 @@ class ApidaeSync {
 
   }
 
-  public function sync($forceUpdate = FALSE) {
+  public function sync($forceUpdate = FALSE, $ids = [])  {
     \Drupal::state()->set('apidae.last_sync', date('U'));
     $first = 0;
     $data['numFound'] = 1000;
@@ -78,7 +78,7 @@ class ApidaeSync {
       'not_updated' => 0,
     ];
     while($data['numFound'] > $first && $first < self::$maxItemsPerBatch) {
-      $data = $this->doQuery($first, self::$count);
+      $data = $this->doQuery($first, self::$count, $ids);
       foreach ($data['objetsTouristiques'] as $objetTouristique) {
         $this->parseOject($objetTouristique, $results, $forceUpdate);
         unset($data['objetsTouristiques']);
@@ -92,10 +92,19 @@ class ApidaeSync {
       '@not_updated' => $results['not_updated'],
       '@num_results' => $data['numFound'],
     ]));
+    if(\count($ids) > 0) {
+      \Drupal::messenger()->addStatus(t('Sync over, @created created, @updated updated, @not_updated unchanged, @error errors, @num_results results', [
+        '@created' => $results['created'],
+        '@updated' => $results['updated'],
+        '@error' => $results['error'],
+        '@not_updated' => $results['not_updated'],
+        '@num_results' => $data['numFound'],
+      ]));
+    }
+    return TRUE;
   }
 
-  protected function doQuery($first, $count) {
-
+  protected function doQuery($first, $count, $ids = []) {
     $random = new Random();
     $query = [
       'projetId'=> $this->apidaeProjectId,
@@ -117,6 +126,10 @@ class ApidaeSync {
         'gestion.dateModification',
       ],
     ];
+
+    if (\count($ids) > 0) {
+      $query['identifiants'] = $ids;
+    }
 
     $url = self::$url . '?query=' . Json::encode($query);
     try {
@@ -170,7 +183,6 @@ class ApidaeSync {
       }
     }
     else {
-      dd($this->getAddress($apidaeObject));
       /** @var Node $objet */
       $objet = array_pop($objet);
       if(!$forceUpdate && $objet->getChangedTime() > $modificationDate->format('U')) {
@@ -214,7 +226,6 @@ class ApidaeSync {
     }
     return NULL;
   }
-
 
   private function getDescription($object, $locale='fr') {
     if(isset($object['presentation']['descriptifsThematises'][0]['description']['libelle' . \ucwords($locale)])) {
@@ -264,8 +275,8 @@ class ApidaeSync {
     if(isset($object['localisation']['adresse'])) {
       return [
         'country_code' => 'FR',
-        'address_line1' => $object['localisation']['adresse']['adresse1'],
-        'address_line2' => $object['localisation']['adresse']['adresse2'],
+        'address_line1' => isset($object['localisation']['adresse']['adresse1']) ? $object['localisation']['adresse']['adresse1'] : NULL,
+        'address_line2' => isset($object['localisation']['adresse']['adresse2']) ? $object['localisation']['adresse']['adresse2'] : NULL,
         'locality' => $object['localisation']['adresse']['commune']['nom'],
         'postal_code' => $object['localisation']['adresse']['commune']['codePostal'],
       ];

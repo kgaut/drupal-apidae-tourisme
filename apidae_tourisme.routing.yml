@@ -9,3 +9,11 @@ apidae_tourisme.apidae_config_form:
   options:
     _admin_route: TRUE
 
+
+apidae_tourisme.apidae_controller_sync:
+  path: '/node/{objet}/force-sync'
+  defaults:
+    _controller: '\Drupal\apidae_tourisme\Controller\ApidaeController::sync'
+    _title: 'sync'
+  requirements:
+    _permission: 'resync touristics objects'

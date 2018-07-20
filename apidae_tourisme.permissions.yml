@@ -2,3 +2,6 @@ configure apidae:
   title: 'Configure Apidae settings'
   description: 'Configure authentification to Apidae webservices'
   restrict access: true
+
+resync touristics objects:
+  title: 'Force resync of touristics objects'
