@@ -100,7 +100,12 @@ class ApidaeSync {
       'responseFields' => [
         'id',
         'nom',
-        'presentation',
+        'localisation',
+        'presentation.descriptifCourt',
+        'descriptionTarif.tarifsEnClair',
+        'informations.moyensCommunication',
+        'illustrations',
+        'multimedias',
       ],
     ];
 
@@ -120,8 +125,7 @@ class ApidaeSync {
 
   protected function parseOject($object, array &$results) {
     $locales = array_diff($this->languages, ['fr']);
-    \dd('---------------------------');
-    \dd($object);
+    dd($this->getGeolocalisation($object));
     if(!$objet = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties(['type' => 'objet_touristique', 'field_id_ws' => $object['id']])) {
       $objet = Node::create([
         'field_id_ws' => $object['id'],
@@ -131,6 +135,7 @@ class ApidaeSync {
         'type' => 'objet_touristique',
         'field_type' => $object['type'],
         'field_description_courte' => $object['presentation']['descriptifCourt']['libelleFr'],
+        'field_phone' => $this->getPhoneFromObject($object),
       ]);
       $objet->save();
       foreach ($locales as $locale) {
@@ -153,6 +158,7 @@ class ApidaeSync {
       $objet = array_pop($objet);
       $objet->set('title', $object['nom']['libelleFr']);
       $objet->set('field_description_courte', $object['presentation']['descriptifCourt']['libelleFr']);
+      $objet->set('field_phone', $this->getPhoneFromObject($object));
       $objet->save();
       foreach ($locales as $locale) {
         if(isset($object['nom']['libelle' . \ucwords($locale)])) {
@@ -179,5 +185,25 @@ class ApidaeSync {
     }
   }
 
+  private function getPhoneFromObject($object, $locale='fr') {
+    foreach ($object['informations']['moyensCommunication'] as $moyen) {
+      if ($moyen['type']['id'] === 201 && isset($moyen['coordonnees'][$locale])) {
+        return $moyen['coordonnees'][$locale];
+      }
+    }
+    return NULL;
+  }
+
+  private function getGeolocalisation($object, $locale='fr') {
+    if(isset(($object['localisation']['geolocalisation']['geoJson']['coordinates']))) {
+      return  [
+        'lat' => $object['localisation']['geolocalisation']['geoJson']['coordinates'][0],
+        'lng' => $object['localisation']['geolocalisation']['geoJson']['coordinates'][1],
+      ];
+    }
+    return NULL;
+  }
+
 }
+
 
