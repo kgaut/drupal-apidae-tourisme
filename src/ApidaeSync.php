@@ -163,6 +163,7 @@ class ApidaeSync {
         'field_illustrations' => $this->getMedias($apidaeObject),
         'field_geolocation' => $this->getGeolocalisation($apidaeObject),
         'field_address' => $this->getAddress($apidaeObject),
+        'promote' => 0,
       ]);
       $objet->save();
       foreach ($locales as $locale) {
@@ -198,6 +199,7 @@ class ApidaeSync {
       $objet->set('field_email', $this->getMailFromObject($apidaeObject));
       $objet->set('field_website', $this->getWebsiteFromObject($apidaeObject));
       $objet->set('field_address', $this->getAddress($apidaeObject));
+      $objet->set('promote', 0);
       $objet->save();
       foreach ($locales as $locale) {
         if(isset($apidaeObject['nom']['libelle' . \ucwords($locale)])) {
