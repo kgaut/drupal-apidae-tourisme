@@ -81,7 +81,6 @@ class ApidaeSync {
       $data = $this->doQuery($first, self::$count, $ids);
       foreach ($data['objetsTouristiques'] as $objetTouristique) {
         $this->parseOject($objetTouristique, $results, $forceUpdate);
-        unset($data['objetsTouristiques']);
       }
       $first += $data['query']['count'];
     }
