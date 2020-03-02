@@ -1,5 +1,9 @@
 # drupal-apidae-tourisme
 
+⚠️ La dernière version de ce module se trouve sur https://www.drupal.org/project/apidae_tourisme
+
+Merci de n'utiliser cette version qu'en connaissance de cause !
+
 ## Installation
 
 ```
